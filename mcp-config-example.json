@@ -1,0 +1,33 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/mcp.json",
+  "mcpServers": {
+    "process-mcp-host": {
+      "command": "node",
+      "args": ["/absolute/path/to/process-mcp/dist/index.js"],
+      "env": {
+        "PROCESS_MODE": "host",
+        "SANDBOX_ALLOWED_DOMAINS": "*",
+        "DEFAULT_WORKDIR": "/tmp"
+      }
+    },
+    "process-mcp-docker": {
+      "command": "node",
+      "args": ["/absolute/path/to/process-mcp/dist/index.js"],
+      "env": {
+        "PROCESS_MODE": "docker",
+        "DOCKER_IMAGE": "ubuntu:22.04",
+        "DOCKER_VOLUME": "process-mcp-volume",
+        "DOCKER_CONTAINER": "process-mcp-main"
+      }
+    },
+    "process-mcp-existing": {
+      "command": "node",
+      "args": ["/absolute/path/to/process-mcp/dist/index.js"],
+      "env": {
+        "PROCESS_MODE": "docker",
+        "DOCKER_USE_EXISTING": "true",
+        "DOCKER_CONTAINER": "my-existing-container"
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "name": "process-mcp",
+  "version": "1.0.0",
+  "description": "Multi-process management docker-connected MCP server",
+  "main": "dist/lib.js",
+  "types": "dist/lib.d.ts",
+  "bin": {
+    "process-mcp": "dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/lib.js",
+      "types": "./dist/lib.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config.js",
+      "types": "./dist/config.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anonx3247/process-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "process",
+    "process-management",
+    "docker",
+    "sandbox",
+    "executor",
+    "claude"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/anonx3247/process-mcp/issues"
+  },
+  "homepage": "https://github.com/anonx3247/process-mcp#readme",
+  "dependencies": {
+    "@anthropic-ai/sandbox-runtime": "^0.0.32",
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@xterm/headless": "^6.0.0",
+    "dockerode": "^4.0.9",
+    "tar-stream": "^3.1.7",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^4.0.1",
+    "@types/node": "^25.1.0",
+    "@types/tar-stream": "^3.1.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

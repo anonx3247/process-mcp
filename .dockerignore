@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+/tmp/
+
+# Test files
+test-*.ts
+test-*.sh
+verify.sh
+
+# Documentation
+*.md
+!README.md
+
+# Config examples
+mcp-config-example.json
