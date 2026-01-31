@@ -1,14 +1,15 @@
-/**
- * Host Executor - executes processes directly on the host system with sandboxing
- */
-
 import { spawn, ChildProcess } from "child_process";
 import { PassThrough } from "stream";
 import xterm from "@xterm/headless";
 const { Terminal } = xterm;
 type Terminal = InstanceType<typeof Terminal>;
 import { SandboxManager } from "@anthropic-ai/sandbox-runtime";
-import { ProcessExecutor } from "./interface.js";
+import {
+  parseEscapeSequences,
+  ProcessExecutor,
+  renderTerminalBuffer,
+  truncateOutput
+} from "./interface.js";
 import { Process, SpawnOptions, ProcessInfo, SpawnResult, TERMINAL_COLS, TERMINAL_ROWS, OUTPUT_TRUNCATE, DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS } from "../types/process.js";
 import { Result, ok, err } from "../lib/error.js";
 import { ProcessRegistry } from "../registry/process-registry.js";
@@ -20,7 +21,7 @@ export class HostExecutor implements ProcessExecutor {
   private childProcesses = new Map<string, ChildProcess>();
   private initialized = false;
 
-  constructor(private config: ProcessMcpConfig) {}
+  constructor(private config: ProcessMcpConfig) { }
 
   async initialize(): Promise<Result<void>> {
     if (this.initialized) {
@@ -100,7 +101,7 @@ export class HostExecutor implements ProcessExecutor {
       terminal,
       getTerminalBuffer: () => {
         if (!terminal) return "";
-        return terminal.buffer.active.getLine(0) ? this.renderTerminalBuffer(terminal) : "";
+        return terminal.buffer.active.getLine(0) ? renderTerminalBuffer(terminal) : "";
       },
     };
 
@@ -193,8 +194,8 @@ export class HostExecutor implements ProcessExecutor {
         return ok({
           pid,
           status: "running",
-          stdout: this.truncateOutput(process.stdout),
-          stderr: this.truncateOutput(process.stderr),
+          stdout: truncateOutput(process.stdout),
+          stderr: truncateOutput(process.stderr),
         });
       }
 
@@ -210,8 +211,8 @@ export class HostExecutor implements ProcessExecutor {
         pid,
         status: process.status,
         exitCode: process.exitCode,
-        stdout: this.truncateOutput(tty ? process.getTerminalBuffer() : process.stdout),
-        stderr: this.truncateOutput(process.stderr),
+        stdout: truncateOutput(tty ? process.getTerminalBuffer() : process.stdout),
+        stderr: truncateOutput(process.stderr),
       });
     } catch (error) {
       process.status = "terminated";
@@ -236,7 +237,7 @@ export class HostExecutor implements ProcessExecutor {
 
     try {
       // Parse escape sequences
-      const parsedInput = this.parseEscapeSequences(input);
+      const parsedInput = parseEscapeSequences(input);
       process.stdinStream.write(parsedInput);
       return ok(undefined);
     } catch (error) {
@@ -244,19 +245,11 @@ export class HostExecutor implements ProcessExecutor {
     }
   }
 
-  getProcess(pid: string): Result<Process> {
-    const process = this.registry.get(pid);
-    if (!process) {
-      return err("process_not_found", `Process ${pid} not found`);
-    }
-    return ok(process);
+  ps(): ProcessInfo[] {
+    return this.registry.list().map(p => this.registry.info(p.pid)!);
   }
 
-  listProcesses(): ProcessInfo[] {
-    return this.registry.list();
-  }
-
-  getOutput(pid: string, lines: number = 100): Result<{ stdout: string; stderr: string }> {
+  stdout(pid: string, lines: number = 100): Result<{ stdout: string; stderr: string }> {
     const process = this.registry.get(pid);
     if (!process) {
       return err("process_not_found", `Process ${pid} not found`);
@@ -328,44 +321,5 @@ export class HostExecutor implements ProcessExecutor {
     }
 
     this.initialized = false;
-  }
-
-  /**
-   * Parse escape sequences in input string
-   */
-  private parseEscapeSequences(input: string): string {
-    return input
-      .replace(/\\n/g, "\n")
-      .replace(/\\r/g, "\r")
-      .replace(/\\t/g, "\t")
-      .replace(/\\x([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
-      .replace(/\\u([0-9A-Fa-f]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-  }
-
-  /**
-   * Render terminal buffer to string
-   */
-  private renderTerminalBuffer(terminal: Terminal): string {
-    const lines: string[] = [];
-    const buffer = terminal.buffer.active;
-
-    for (let i = 0; i < buffer.length; i++) {
-      const line = buffer.getLine(i);
-      if (line) {
-        lines.push(line.translateToString(true));
-      }
-    }
-
-    return lines.join("\n");
-  }
-
-  /**
-   * Truncate output to max length
-   */
-  private truncateOutput(output: string): string {
-    if (output.length <= OUTPUT_TRUNCATE) {
-      return output;
-    }
-    return output.slice(-OUTPUT_TRUNCATE) + "\n... (truncated)";
   }
 }

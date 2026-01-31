@@ -1,53 +1,42 @@
-/**
- * Process Registry - manages process tracking and cleanup
- */
-
 import { Process, ProcessInfo } from "../types/process.js";
 
 export class ProcessRegistry {
   private processes = new Map<string, Process>();
   private readonly maxTerminatedProcesses = 5;
 
-  /**
-   * Add a process to the registry
-   */
   add(process: Process): void {
     this.processes.set(process.pid, process);
     this.pruneTerminated();
   }
 
-  /**
-   * Get a process by PID
-   */
   get(pid: string): Process | undefined {
     return this.processes.get(pid);
   }
 
-  /**
-   * List all processes
-   */
-  list(): ProcessInfo[] {
-    return Array.from(this.processes.values()).map(p => ({
-      pid: p.pid,
-      command: p.command,
-      status: p.status,
-      exitCode: p.exitCode,
-      cwd: p.cwd,
-      tty: p.tty,
-      createdAt: p.createdAt.toISOString(),
-    }));
+  list(): Process[] {
+    return Array.from(this.processes.values());
   }
 
-  /**
-   * Delete a process from the registry
-   */
+  info(pid: string): ProcessInfo | undefined {
+    const process = this.processes.get(pid);
+    if (!process) {
+      return undefined;
+    }
+    return {
+      pid: process.pid,
+      command: process.command,
+      status: process.status,
+      exitCode: process.exitCode,
+      cwd: process.cwd,
+      tty: process.tty,
+      createdAt: process.createdAt.toISOString(),
+    };
+  }
+
   delete(pid: string): boolean {
     return this.processes.delete(pid);
   }
 
-  /**
-   * Prune terminated processes, keeping only the last N
-   */
   private pruneTerminated(): void {
     const terminated = Array.from(this.processes.values())
       .filter(p => p.status === "terminated")
@@ -59,9 +48,6 @@ export class ProcessRegistry {
     }
   }
 
-  /**
-   * Get count of processes by status
-   */
   getStats(): { running: number; terminated: number; total: number } {
     let running = 0;
     let terminated = 0;
@@ -77,9 +63,6 @@ export class ProcessRegistry {
     return { running, terminated, total: this.processes.size };
   }
 
-  /**
-   * Clear all processes (for cleanup)
-   */
   clear(): void {
     this.processes.clear();
   }

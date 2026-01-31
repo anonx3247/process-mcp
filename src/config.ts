@@ -1,28 +1,17 @@
-/**
- * Configuration and mode selection
- */
-
 import { SandboxRuntimeConfig } from "@anthropic-ai/sandbox-runtime";
 import { DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS } from "./types/process.js";
 
 export type ExecutionMode = "host" | "docker";
 
 export interface ProcessMcpConfig {
-  /** Execution mode */
   mode: ExecutionMode;
-
-  /** Sandbox configuration (for host mode) */
   sandbox?: SandboxRuntimeConfig;
-
-  /** Docker configuration (for docker mode) */
   docker?: {
     image: string;
     volumeName: string;
     containerName: string;
     useExisting: boolean;
   };
-
-  /** Default settings */
   defaults: {
     workdir: string;
     timeoutMs: number;
@@ -30,29 +19,19 @@ export interface ProcessMcpConfig {
   };
 }
 
-/**
- * Parse allowed domains from environment variable
- */
 function parseAllowedDomains(env?: string): string[] {
   if (!env) return ["*"];
   return env.split(",").map(h => h.trim()).filter(h => h.length > 0);
 }
 
-/**
- * Parse file paths from environment variable
- */
 function parsePaths(env?: string): string[] {
   if (!env) return [];
   return env.split(",").map(p => p.trim()).filter(p => p.length > 0);
 }
 
-/**
- * Load configuration from environment variables
- */
 export function loadConfig(): ProcessMcpConfig {
   const mode = (process.env.PROCESS_MODE || "host") as ExecutionMode;
 
-  // Default sandbox config for host mode
   const defaultSandboxConfig: SandboxRuntimeConfig = {
     network: {
       allowedDomains: parseAllowedDomains(process.env.SANDBOX_ALLOWED_DOMAINS),
@@ -70,7 +49,6 @@ export function loadConfig(): ProcessMcpConfig {
     },
   };
 
-  // Default Docker config
   const defaultDockerConfig = {
     image: process.env.DOCKER_IMAGE || "ubuntu:22.04",
     volumeName: process.env.DOCKER_VOLUME || "process-mcp-volume",

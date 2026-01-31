@@ -1,9 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * Process MCP Server - CLI entry point
- */
-
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { loadConfig } from "./config.js";
 import { createProcessMCP } from "./server.js";

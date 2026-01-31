@@ -1,8 +1,3 @@
-/**
- * Process MCP Server - Library export
- * Creates and configures an MCP server instance for process management
- */
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
@@ -28,11 +23,8 @@ import {
 import { errorToCallToolResult } from "./lib/mcp.js";
 
 export interface ProcessMcpServer {
-  /** The MCP server instance */
   server: Server;
-  /** The process executor (host or docker) */
   executor: ProcessExecutor;
-  /** Cleanup function - call when done */
   cleanup: () => Promise<void>;
 }
 

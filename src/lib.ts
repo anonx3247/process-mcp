@@ -1,8 +1,3 @@
-/**
- * Process MCP - Library exports
- * Use this to integrate process-mcp into your own Node.js applications
- */
-
 // Main server factory
 export { createProcessMCP } from "./server.js";
 export type { ProcessMcpServer } from "./server.js";

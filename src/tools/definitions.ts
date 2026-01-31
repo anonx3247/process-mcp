@@ -48,7 +48,7 @@ export async function handlePs(
   executor: ProcessExecutor,
   args: z.infer<typeof psSchema>
 ): Promise<CallToolResult> {
-  const processes = executor.listProcesses();
+  const processes = executor.ps();
   return {
     content: [
       {
@@ -81,7 +81,7 @@ export async function handleStdout(
   executor: ProcessExecutor,
   args: z.infer<typeof stdoutSchema>
 ): Promise<CallToolResult> {
-  const result = executor.getOutput(args.id, args.lines);
+  const result = executor.stdout(args.id, args.lines);
   return resultToCallToolResult(result);
 }
 
