@@ -3,6 +3,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
 import { ProcessMcpConfig } from "./config.js";
 import { HostExecutor } from "./executors/host-executor.js";
 import { DockerExecutor } from "./executors/docker-executor.js";
@@ -95,7 +96,7 @@ export async function createProcessMCP(config: ProcessMcpConfig): Promise<Proces
     tools: toolDefinitions.map((tool) => ({
       name: tool.name,
       description: tool.description,
-      inputSchema: tool.inputSchema.shape,
+      inputSchema: z.toJSONSchema(tool.inputSchema),
     })),
   }));
 
