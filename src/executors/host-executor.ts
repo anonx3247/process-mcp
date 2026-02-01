@@ -123,7 +123,7 @@ export class HostExecutor implements ProcessExecutor {
       // Spawn process
       const mergedEnv = { ...globalThis.process.env, ...env };
       const childProcess = spawn(sandboxedCmd, {
-        shell: globalThis.process.env.SHELL || true,
+        shell: true,
         cwd,
         env: mergedEnv,
         stdio: ["pipe", "pipe", "pipe"],
