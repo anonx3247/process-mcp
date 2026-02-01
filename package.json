@@ -1,6 +1,6 @@
 {
   "name": "@anonx3247/process-mcp",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Multi-process management docker-connected MCP server",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
