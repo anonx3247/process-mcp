@@ -81,7 +81,7 @@ export class HostExecutor implements ProcessExecutor {
     // Create terminal for TTY mode
     let terminal: Terminal | undefined;
     if (tty) {
-      terminal = new Terminal({ cols: TERMINAL_COLS, rows: TERMINAL_ROWS });
+      terminal = new Terminal({ cols: TERMINAL_COLS, rows: TERMINAL_ROWS, allowProposedApi: true });
     }
 
     // Create process object

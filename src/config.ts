@@ -61,7 +61,7 @@ export function loadConfig(): ProcessMcpConfig {
     sandbox: mode === "host" ? defaultSandboxConfig : undefined,
     docker: mode === "docker" ? defaultDockerConfig : undefined,
     defaults: {
-      workdir: process.env.DEFAULT_WORKDIR || "/home/agent",
+      workdir: process.env.DEFAULT_WORKDIR || (mode === "docker" ? "/home/agent" : process.env.HOME || "/tmp"),
       timeoutMs: DEFAULT_TIMEOUT_MS,
       maxTimeoutMs: MAX_TIMEOUT_MS,
     },
